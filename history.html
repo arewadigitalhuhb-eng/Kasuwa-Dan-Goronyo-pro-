@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>Sales History - Kasuwa Dan Goronyo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <button class="icon-btn back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="logo">
+                    <span>Sales History</span>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="showDateFilter()">
+                        <i class="fas fa-calendar"></i>
+                    </button>
+                    <button class="icon-btn" onclick="exportSales()">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Date Range Display -->
+            <section class="date-range-section">
+                <div class="date-range" id="dateRangeDisplay">
+                    <span id="currentDateLabel">Today</span>
+                    <button onclick="showDateFilter()">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Summary Cards -->
+            <section class="history-summary">
+                <div class="summary-card">
+                    <h4 id="historyTotalSales">₦0.00</h4>
+                    <p>Total Sales</p>
+                </div>
+                <div class="summary-card">
+                    <h4 id="historyTransactions">0</h4>
+                    <p>Transactions</p>
+                </div>
+                <div class="summary-card">
+                    <h4 id="historyProfit">₦0.00</h4>
+                    <p>Profit</p>
+                </div>
+            </section>
+
+            <!-- Sales List -->
+            <section class="sales-history-section">
+                <div class="sales-list" id="salesHistoryList">
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>No sales found</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Date Filter Modal -->
+        <div class="modal" id="dateFilterModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Select Date Range</h3>
+                    <button class="close-btn" onclick="closeDateFilter()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="date-options">
+                    <button class="date-option active" data-range="today" onclick="setDateRange('today')">Today</button>
+                    <button class="date-option" data-range="yesterday" onclick="setDateRange('yesterday')">Yesterday</button>
+                    <button class="date-option" data-range="week" onclick="setDateRange('week')">This Week</button>
+                    <button class="date-option" data-range="month" onclick="setDateRange('month')">This Month</button>
+                    <button class="date-option" data-range="all" onclick="setDateRange('all')">All Time</button>
+                </div>
+                <div class="custom-date-range">
+                    <div class="form-group">
+                        <label>From</label>
+                        <input type="date" id="dateFrom">
+                    </div>
+                    <div class="form-group">
+                        <label>To</label>
+                        <input type="date" id="dateTo">
+                    </div>
+                </div>
+                <div style="padding: 0 1rem 1rem;">
+                    <button class="btn-primary btn-full" onclick="applyDateFilter()">Apply Filter</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sale Detail Modal -->
+        <div class="modal" id="saleDetailModal">
+            <div class="modal-content sale-detail-content">
+                <div class="modal-header">
+                    <h3>Sale Details</h3>
+                    <button class="close-btn" onclick="closeSaleDetail()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="saleDetailContent">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="stock.html" class="nav-link">
+                <i class="fas fa-boxes"></i>
+                <span>Stock</span>
+            </a>
+            <a href="sale.html" class="nav-link sale-link">
+                <div class="sale-circle">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span>Sale</span>
+            </a>
+            <a href="history.html" class="nav-link active">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Global variables
+        let allSales = [];
+        let currentFilter = 'today';
+        let filteredSales = [];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('History page loaded');
+            loadSales();
+            setupDateInputs();
+        });
+
+        // Load all sales from localStorage
+        function loadSales() {
+            try {
+                allSales = JSON.parse(localStorage.getItem('sales')) || [];
+                console.log('Loaded sales:', allSales.length);
+                applyCurrentFilter();
+            } catch (e) {
+                console.error('Error loading sales:', e);
+                allSales = [];
+                showNotification('Error loading sales data', 'error');
+            }
+        }
+
+        // Setup date inputs to today
+        function setupDateInputs() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateFrom = document.getElementById('dateFrom');
+            const dateTo = document.getElementById('dateTo');
+            
+            if (dateFrom) dateFrom.value = today;
+            if (dateTo) dateTo.value = today;
+        }
+
+        // Apply current date filter
+        function applyCurrentFilter() {
+            const now = new Date();
+            let startDate, endDate;
+
+            switch(currentFilter) {
+                case 'today':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    break;
+                    
+                case 'yesterday':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59);
+                    break;
+                    
+                case 'week':
+                    const dayOfWeek = now.getDay();
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    break;
+                    
+                case 'month':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    break;
+                    
+                case 'all':
+                    startDate = new Date(2000, 0, 1);
+                    endDate = new Date(2099, 11, 31);
+                    break;
+                    
+                default:
+                    // Custom range
+                    const fromVal = document.getElementById('dateFrom')?.value;
+                    const toVal = document.getElementById('dateTo')?.value;
+                    
+                    if (fromVal && toVal) {
+                        startDate = new Date(fromVal);
+                        startDate.setHours(0, 0, 0);
+                        endDate = new Date(toVal);
+                        endDate.setHours(23, 59, 59);
+                    } else {
+                        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+                        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    }
+            }
+
+            console.log('Filter:', currentFilter, 'Start:', startDate, 'End:', endDate);
+
+            // Filter sales
+            filteredSales = allSales.filter(sale => {
+                if (!sale.date) return false;
+                const saleDate = new Date(sale.date);
+                return saleDate >= startDate && saleDate <= endDate;
+            });
+
+            // Sort by date descending (newest first)
+            filteredSales.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            console.log('Filtered sales:', filteredSales.length);
+
+            // Update UI
+            renderSalesHistory();
+            updateSummary();
+            updateDateLabel();
+        }
+
+        // Update the date range label
+        function updateDateLabel() {
+            const label = document.getElementById('currentDateLabel');
+            if (!label) return;
+            
+            const labels = {
+                'today': 'Today',
+                'yesterday': 'Yesterday',
+                'week': 'This Week',
+                'month': 'This Month',
+                'all': 'All Time'
+            };
+            
+            label.textContent = labels[currentFilter] || 'Custom Range';
+        }
+
+        // Render sales list
+        function renderSalesHistory() {
+            const container = document.getElementById('salesHistoryList');
+            if (!container) {
+                console.error('Sales list container not found');
+                return;
+            }
+            
+            if (filteredSales.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>No sales found for this period</p>
+                        <span>Try selecting a different date range</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by date
+            const grouped = groupByDate(filteredSales);
+            
+            let html = '';
+            for (const [date, sales] of Object.entries(grouped)) {
+                const dateTotal = sales.reduce((sum, s) => sum + (parseFloat(s.total) || 0), 0);
+                
+                html += `
+                    <div class="date-group">
+                        <div class="date-header">
+                            <span>${formatDateHeader(date)}</span>
+                            <span class="date-total">₦${formatNumber(dateTotal)}</span>
+                        </div>
+                `;
+                
+                for (const sale of sales) {
+                    html += createSaleCard(sale);
+                }
+                
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Create sale card HTML
+        function createSaleCard(sale) {
+            const items = sale.items || [];
+            const itemBadges = items.slice(0, 3).map(item => 
+                `<span class="item-badge">${item.quantity}× ${escapeHtml(item.name)}</span>`
+            ).join('');
+            
+            const moreItems = items.length > 3 ? `<span class="item-badge">+${items.length - 3} more</span>` : '';
+            
+            const paymentMethod = sale.paymentMethod || 'cash';
+            const status = sale.status || 'completed';
+            
+            return `
+                <div class="sale-card" onclick="viewSaleDetail(${sale.id})">
+                    <div class="sale-card-header">
+                        <div class="sale-info">
+                            <h4>${escapeHtml(sale.customer || 'Walk-in Customer')}</h4>
+                            <p>${formatTime(sale.date)}</p>
+                        </div>
+                        <div class="sale-amount">₦${formatNumber(sale.total)}</div>
+                    </div>
+                    <div class="sale-card-items">
+                        ${itemBadges}
+                        ${moreItems}
+                    </div>
+                    <div class="sale-card-footer">
+                        <span class="payment-method ${paymentMethod}">
+                            <i class="fas ${getPaymentIcon(paymentMethod)}"></i>
+                            ${paymentMethod}
+                        </span>
+                        <span class="sale-status ${status}">${status}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Group sales by date
+        function groupByDate(sales) {
+            const groups = {};
+            
+            for (const sale of sales) {
+                const date = new Date(sale.date).toDateString();
+                if (!groups[date]) {
+                    groups[date] = [];
+                }
+                groups[date].push(sale);
+            }
+            
+            return groups;
+        }
+
+        // Format date header
+        function formatDateHeader(dateStr) {
+            const date = new Date(dateStr);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+                return 'Today';
+            } else if (date.toDateString() === yesterday.toDateString()) {
+                return 'Yesterday';
+            }
+            
+            return date.toLocaleDateString('en-NG', { 
+                weekday: 'long', 
+                year: 'numeric',
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Get payment icon
+        function getPaymentIcon(method) {
+            const icons = {
+                cash: 'fa-money-bill-wave',
+                transfer: 'fa-mobile-alt',
+                credit: 'fa-credit-card',
+                card: 'fa-credit-card'
+            };
+            return icons[method] || 'fa-money-bill';
+        }
+
+        // Update summary cards
+        function updateSummary() {
+            const totalSales = filteredSales.reduce((sum, s) => sum + (parseFloat(s.total) || 0), 0);
+            
+            const totalProfit = filteredSales.reduce((sum, s) => {
+                const items = s.items || [];
+                const cost = items.reduce((c, item) => {
+                    return c + ((parseFloat(item.costPrice) || 0) * (parseInt(item.quantity) || 0));
+                }, 0);
+                return sum + ((parseFloat(s.total) || 0) - cost - (parseFloat(s.discount) || 0));
+            }, 0);
+
+            const totalEl = document.getElementById('historyTotalSales');
+            const transEl = document.getElementById('historyTransactions');
+            const profitEl = document.getElementById('historyProfit');
+            
+            if (totalEl) totalEl.textContent = '₦' + formatNumber(totalSales);
+            if (transEl) transEl.textContent = filteredSales.length;
+            if (profitEl) profitEl.textContent = '₦' + formatNumber(totalProfit);
+        }
+
+        // Show date filter modal
+        function showDateFilter() {
+            const modal = document.getElementById('dateFilterModal');
+            if (modal) {
+                modal.classList.add('active');
+                
+                // Update active state of buttons
+                document.querySelectorAll('.date-option').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.range === currentFilter) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Close date filter modal
+        function closeDateFilter() {
+            const modal = document.getElementById('dateFilterModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // Set date range
+        function setDateRange(range) {
+            currentFilter = range;
+            
+            // Update UI
+            document.querySelectorAll('.date-option').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.range === range) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Apply immediately for preset ranges
+            if (range !== 'custom') {
+                closeDateFilter();
+                applyCurrentFilter();
+            }
+        }
+
+        // Apply custom date filter
+        function applyDateFilter() {
+            currentFilter = 'custom';
+            closeDateFilter();
+            applyCurrentFilter();
+        }
+
+        // View sale detail
+        function viewSaleDetail(saleId) {
+            const sale = allSales.find(s => s.id === saleId);
+            if (!sale) {
+                showNotification('Sale not found', 'error');
+                return;
+            }
+
+            const content = document.getElementById('saleDetailContent');
+            if (!content) return;
+
+            const items = sale.items || [];
+            const profit = calculateProfit(sale);
+            
+            let itemsHtml = items.map(item => `
+                <div class="detail-item-row">
+                    <div>
+                        <span class="item-name">${escapeHtml(item.name)}</span>
+                        <span class="item-qty">× ${item.quantity}</span>
+                    </div>
+                    <span class="item-price">₦${formatNumber(item.price * item.quantity)}</span>
+                </div>
+            `).join('');
+
+            content.innerHTML = `
+                <div class="sale-detail-header">
+                    <div class="receipt-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h2>₦${formatNumber(sale.total)}</h2>
+                    <p>${formatDate(sale.date)}</p>
+                    <span class="receipt-id">#${sale.id}</span>
+                </div>
+
+                <div class="detail-section">
+                    <h4>Customer</h4>
+                    <p>${escapeHtml(sale.customer || 'Walk-in Customer')}</p>
+                </div>
+
+                <div class="detail-section">
+                    <h4>Items (${items.length})</h4>
+                    <div class="detail-items">
+                        ${itemsHtml || '<p class="no-data">No items</p>'}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4>Payment</h4>
+                    <div class="payment-info">
+                        <span>
+                            <i class="fas ${getPaymentIcon(sale.paymentMethod)}"></i> 
+                            ${sale.paymentMethod || 'cash'}
+                        </span>
+                        <span class="status-badge ${sale.status || 'completed'}">
+                            ${sale.status || 'completed'}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="detail-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>₦${formatNumber(sale.subtotal || sale.total)}</span>
+                    </div>
+                    ${sale.discount ? `
+                    <div class="summary-row">
+                        <span>Discount</span>
+                        <span>-₦${formatNumber(sale.discount)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span>₦${formatNumber(sale.total)}</span>
+                    </div>
+                    <div class="summary-row profit">
+                        <span>Profit</span>
+                        <span>₦${formatNumber(profit)}</span>
+                    </div>
+                </div>
+
+                <div class="detail-actions">
+                    <button class="btn-secondary" onclick="printSale(${sale.id})">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    ${sale.status !== 'voided' ? `
+                    <button class="btn-danger" onclick="voidSale(${sale.id})">
+                        <i class="fas fa-ban"></i> Void
+                    </button>
+                    ` : ''}
+                </div>
+            `;
+
+            const modal = document.getElementById('saleDetailModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        // Close sale detail modal
+        function closeSaleDetail() {
+            const modal = document.getElementById('saleDetailModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // Calculate profit for a sale
+        function calculateProfit(sale) {
+            const items = sale.items || [];
+            const cost = items.reduce((sum, item) => {
+                return sum + ((parseFloat(item.costPrice) || 0) * (parseInt(item.quantity) || 0));
+            }, 0);
+            return (parseFloat(sale.total) || 0) - cost - (parseFloat(sale.discount) || 0);
+        }
+
+        // Print sale receipt
+        function printSale(saleId) {
+            window.print();
+        }
+
+        // Void a sale
+        function voidSale(saleId) {
+            if (!confirm('Are you sure you want to void this sale? This will restore inventory.')) {
+                return;
+            }
+
+            const saleIndex = allSales.findIndex(s => s.id === saleId);
+            if (saleIndex === -1) {
+                showNotification('Sale not found', 'error');
+                return;
+            }
+
+            const sale = allSales[saleIndex];
+
+            // Restore inventory
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const items = sale.items || [];
+            
+            for (const item of items) {
+                const product = products.find(p => p.id === item.productId);
+                if (product) {
+                    product.quantity = (parseInt(product.quantity) || 0) + (parseInt(item.quantity) || 0);
+                }
+            }
+
+            // Update sale status
+            sale.status = 'voided';
+            sale.voidedAt = new Date().toISOString();
+
+            // Save everything
+            localStorage.setItem('sales', JSON.stringify(allSales));
+            localStorage.setItem('products', JSON.stringify(products));
+
+            // Update UI
+            closeSaleDetail();
+            loadSales();
+            showNotification('Sale voided successfully', 'success');
+        }
+
+        // Export sales to CSV
+        function exportSales() {
+            if (filteredSales.length === 0) {
+                showNotification('No data to export', 'error');
+                return;
+            }
+
+            const headers = ['Date', 'Time', 'Customer', 'Items', 'Subtotal', 'Discount', 'Total', 'Payment', 'Status'];
+            
+            const rows = filteredSales.map(sale => {
+                const date = new Date(sale.date);
+                const items = (sale.items || []).map(i => `${i.name}(${i.quantity})`).join('; ');
+                
+                return [
+                    date.toLocaleDateString('en-NG'),
+                    date.toLocaleTimeString('en-NG'),
+                    sale.customer || 'Walk-in',
+                    items,
+                    sale.subtotal || sale.total,
+                    sale.discount || 0,
+                    sale.total,
+                    sale.paymentMethod || 'cash',
+                    sale.status || 'completed'
+                ];
+            });
+
+            // Create CSV
+            const csv = [headers, ...rows].map(row => 
+                row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+            ).join('\n');
+
+            // Download
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `sales_export_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Sales exported successfully!', 'success');
+        }
+
+        // Format number with commas
+        function formatNumber(num) {
+            if (num === undefined || num === null) return '0.00';
+            return parseFloat(num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        // Format full date
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleString('en-NG', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Format time only
+        function formatTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('en-NG', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Go back function
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

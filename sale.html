@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>New Sale - Kasuwa Dan Goronyo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Gallery Grid Styles */
+        .products-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 100px;
+        }
+
+        .product-gallery-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-gallery-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .product-gallery-card.out-of-stock {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        .product-gallery-card.in-cart {
+            border: 2px solid var(--primary-color);
+        }
+
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 3rem;
+        }
+
+        .product-stock-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .product-stock-badge.low {
+            background: var(--warning-color);
+            color: #333;
+        }
+
+        .product-stock-badge.out {
+            background: var(--danger-color);
+        }
+
+        .cart-quantity-badge {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .product-gallery-info {
+            padding: 1rem;
+        }
+
+        .product-gallery-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-gallery-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .product-gallery-category {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Category Filter Chips */
+        .filter-chips-container {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .filter-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .filter-chip img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Search and Filter Bar */
+        .search-filter-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-box-large {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-box-large input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            background: var(--card-bg);
+        }
+
+        .search-box-large i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Customer Bar */
+        .customer-bar {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .customer-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .customer-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Empty State */
+        .gallery-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .gallery-empty i {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* Cart Bar */
+        .cart-bar {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 2rem);
+            max-width: 448px;
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 90;
+        }
+
+        .cart-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-icon i {
+            font-size: 1.5rem;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--secondary-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .cart-text {
+            font-weight: 600;
+        }
+
+        .cart-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* Product Detail Modal */
+        .product-quick-view {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quick-view-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+        }
+
+        .quick-view-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .qty-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .qty-btn:hover {
+            background: var(--bg-color);
+        }
+
+        .qty-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .stock-info {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <button class="icon-btn back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="logo">
+                    <span>New Sale</span>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="clearCart()">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content sale-page">
+            <!-- Customer Selection -->
+            <div class="customer-bar" onclick="showCustomerModal()">
+                <div class="customer-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="customer-info">
+                    <h4 id="selectedCustomerName">Walk-in Customer</h4>
+                    <p id="selectedCustomerInfo">Tap to select customer</p>
+                </div>
+                <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+            </div>
+
+            <!-- Search -->
+            <div class="search-filter-bar">
+                <div class="search-box-large">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchProducts" placeholder="Search products..." onkeyup="searchProducts()">
+                </div>
+                <button class="icon-btn scan-btn" onclick="startBarcodeScan()" style="width: 56px; height: 56px;">
+                    <i class="fas fa-barcode"></i>
+                </button>
+            </div>
+
+            <!-- Category Filter Chips -->
+            <div class="filter-chips-container" id="categoryChips">
+                <button class="filter-chip active" onclick="filterByCategory('all')">
+                    <i class="fas fa-th-large"></i>
+                    <span>All</span>
+                </button>
+            </div>
+
+            <!-- Products Gallery -->
+            <div class="products-gallery" id="productsGallery">
+                <div class="gallery-empty">
+                    <i class="fas fa-box-open"></i>
+                    <p>No products available</p>
+                    <button class="btn-primary" onclick="goToStock()" style="margin-top: 1rem;">
+                        Add Products
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Product Quick View Modal -->
+        <div class="modal" id="productModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalProductName">Product Name</h3>
+                    <button class="close-btn" onclick="closeProductModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="product-quick-view">
+                    <div id="modalProductImage">
+                        <!-- Dynamic image -->
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="product-gallery-price" id="modalProductPrice">₦0.00</div>
+                        <div class="product-gallery-category" id="modalProductCategory">Category</div>
+                    </div>
+                    <div class="stock-info" id="modalStockInfo">15 in stock</div>
+                    <div class="quantity-selector">
+                        <button class="qty-btn" onclick="adjustQuantity(-1)">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span class="qty-display" id="modalQuantity">1</span>
+                        <button class="qty-btn" onclick="adjustQuantity(1)">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <button class="btn-primary btn-full" onclick="addToCartFromModal()">
+                        <i class="fas fa-cart-plus"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Modal -->
+        <div class="modal cart-modal" id="cartModal">
+            <div class="modal-content cart-content">
+                <div class="modal-header">
+                    <h3>Current Order</h3>
+                    <button class="close-btn" onclick="closeCartModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="cart-items" id="cartItems">
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-basket"></i>
+                        <p>Your cart is empty</p>
+                    </div>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="cartSubtotal">₦0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Discount</span>
+                        <div class="discount-input">
+                            <input type="number" id="cartDiscount" value="0" min="0" onchange="updateCartSummary()">
+                        </div>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="cartGrandTotal">₦0.00</span>
+                    </div>
+                </div>
+
+                <div class="payment-section">
+                    <h4>Payment Method</h4>
+                    <div class="payment-methods">
+                        <button class="payment-method active" data-method="cash" onclick="setPaymentMethod('cash')">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Cash</span>
+                        </button>
+                        <button class="payment-method" data-method="transfer" onclick="setPaymentMethod('transfer')">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Transfer</span>
+                        </button>
+                        <button class="payment-method" data-method="credit" onclick="setPaymentMethod('credit')">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Credit</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cart-actions">
+                    <button class="btn-secondary" onclick="closeCartModal()">Continue Shopping</button>
+                    <button class="btn-primary btn-large" onclick="completeSale()">
+                        <i class="fas fa-check"></i> Complete Sale
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Selection Modal -->
+        <div class="modal" id="customerModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Select Customer</h3>
+                    <button class="close-btn" onclick="closeCustomerModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="customer-search" style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                    <input type="text" id="customerSearch" placeholder="Search customers..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                </div>
+                <div class="customers-list-modal" id="customersListModal" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Dynamic customers -->
+                </div>
+                <div style="padding: 1rem; border-top: 1px solid var(--border-color);">
+                    <button class="btn-secondary btn-full" onclick="quickAddCustomer()">
+                        <i class="fas fa-plus"></i> Add New Customer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Bar -->
+        <div class="cart-bar" onclick="showCartModal()" id="cartBar" style="display: none;">
+            <div class="cart-info">
+                <div class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+                <span class="cart-text" id="cartText">0 items</span>
+            </div>
+            <div class="cart-total" id="cartBarTotal">₦0.00</div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="stock.html" class="nav-link">
+                <i class="fas fa-boxes"></i>
+                <span>Stock</span>
+            </a>
+            <a href="sale.html" class="nav-link sale-link active">
+                <div class="sale-circle">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span>Sale</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Global variables
+        let products = [];
+        let categories = [];
+        let cart = [];
+        let customers = [];
+        let selectedCustomer = null;
+        let currentPaymentMethod = 'cash';
+        let currentCategoryFilter = 'all';
+        let modalProduct = null;
+        let modalQty = 1;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+
+        // Load all data
+        function loadData() {
+            products = JSON.parse(localStorage.getItem('products')) || [];
+            categories = JSON.parse(localStorage.getItem('categories')) || [];
+            customers = JSON.parse(localStorage.getItem('customers')) || [];
+            
+            renderCategoryChips();
+            renderProducts();
+        }
+
+        // Render category filter chips
+        function renderCategoryChips() {
+            const container = document.getElementById('categoryChips');
+            
+            let html = `
+                <button class="filter-chip ${currentCategoryFilter === 'all' ? 'active' : ''}" onclick="filterByCategory('all')">
+                    <i class="fas fa-th-large"></i>
+                    <span>All</span>
+                </button>
+            `;
+            
+            categories.forEach(cat => {
+                const isActive = currentCategoryFilter === cat.name;
+                html += `
+                    <button class="filter-chip ${isActive ? 'active' : ''}" onclick="filterByCategory('${escapeHtml(cat.name)}')">
+                        ${cat.image ? `<img src="${cat.image}" onerror="this.style.display='none'">` : '<i class="fas fa-tag"></i>'}
+                        <span>${escapeHtml(cat.name)}</span>
+                    </button>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            currentCategoryFilter = category;
+            renderCategoryChips();
+            renderProducts();
+        }
+
+        // Render products gallery
+        function renderProducts() {
+            const container = document.getElementById('productsGallery');
+            const searchTerm = document.getElementById('searchProducts').value.toLowerCase();
+            
+            let filtered = currentCategoryFilter === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentCategoryFilter);
+            
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) ||
+                    (p.category && p.category.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Only show in-stock products
+            filtered = filtered.filter(p => p.quantity > 0);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="gallery-empty">
+                        <i class="fas fa-box-open"></i>
+                        <p>${currentCategoryFilter === 'all' ? 'No products available' : 'No products in this category'}</p>
+                        ${searchTerm ? '<p>Try a different search</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(product => {
+                const inCart = cart.find(item => item.id === product.id);
+                const cartQty = inCart ? inCart.quantity : 0;
+                
+                const isLowStock = product.quantity <= (product.lowStockAlert || 10);
+                const stockClass = isLowStock ? 'low' : '';
+                
+                // Check if product has image (from future enhancement)
+                const hasImage = product.image;
+                
+                return `
+                    <div class="product-gallery-card ${cartQty > 0 ? 'in-cart' : ''}" 
+                         onclick="openProductModal(${product.id})">
+                        
+                        <div class="product-image-container">
+                            ${hasImage ? `
+                                <img src="${product.image}" class="product-image" alt="${escapeHtml(product.name)}" 
+                                     onerror="this.parentElement.innerHTML='<div class=\\'product-image-placeholder\\'><i class=\\'fas fa-box\\'></i></div>'">
+                            ` : `
+                                <div class="product-image-placeholder">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                            `}
+                            
+                            <span class="product-stock-badge ${stockClass}">
+                                ${product.quantity} left
+                            </span>
+                            
+                            ${cartQty > 0 ? `
+                                <span class="cart-quantity-badge">${cartQty}</span>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="product-gallery-info">
+                            <div class="product-gallery-name">${escapeHtml(product.name)}</div>
+                            <div class="product-gallery-price">₦${formatNumber(product.sellingPrice)}</div>
+                            <div class="product-gallery-category">${escapeHtml(product.category || 'Uncategorized')}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Search products
+        function searchProducts() {
+            renderProducts();
+        }
+
+        // Open product modal
+        function openProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            modalProduct = product;
+            modalQty = 1;
+
+            document.getElementById('modalProductName').textContent = product.name;
+            document.getElementById('modalProductPrice').textContent = '₦' + formatNumber(product.sellingPrice);
+            document.getElementById('modalProductCategory').textContent = product.category || 'Uncategorized';
+            document.getElementById('modalStockInfo').textContent = `${product.quantity} in stock`;
+            document.getElementById('modalQuantity').textContent = modalQty;
+
+            // Image
+            const imgContainer = document.getElementById('modalProductImage');
+            if (product.image) {
+                imgContainer.innerHTML = `<img src="${product.image}" class="quick-view-image" onerror="this.outerHTML='<div class=\\'quick-view-placeholder\\'><i class=\\'fas fa-box\\'></i></div>'">`;
+            } else {
+                imgContainer.innerHTML = `<div class="quick-view-placeholder"><i class="fas fa-box"></i></div>`;
+            }
+
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        // Close product modal
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('active');
+            modalProduct = null;
+        }
+
+        // Adjust quantity in modal
+        function adjustQuantity(delta) {
+            if (!modalProduct) return;
+            
+            const newQty = modalQty + delta;
+            if (newQty < 1) return;
+            if (newQty > modalProduct.quantity) {
+                showNotification('Not enough stock!', 'error');
+                return;
+            }
+            
+            modalQty = newQty;
+            document.getElementById('modalQuantity').textContent = modalQty;
+        }
+
+        // Add to cart from modal
+        function addToCartFromModal() {
+            if (!modalProduct) return;
+            
+            addToCart(modalProduct.id, modalQty);
+            closeProductModal();
+        }
+
+        // Add to cart
+        function addToCart(productId, quantity = 1) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                const newQty = existingItem.quantity + quantity;
+                if (newQty > product.quantity) {
+                    showNotification('Not enough stock!', 'error');
+                    return;
+                }
+                existingItem.quantity = newQty;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.sellingPrice,
+                    costPrice: product.costPrice,
+                    quantity: quantity,
+                    maxStock: product.quantity
+                });
+            }
+
+            updateCartUI();
+            renderProducts();
+            showNotification('Added to cart', 'success');
+        }
+
+        // Update cart UI
+        function updateCartUI() {
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            // Update cart bar
+            const cartBar = document.getElementById('cartBar');
+            if (itemCount > 0) {
+                cartBar.style.display = 'flex';
+                document.getElementById('cartCount').textContent = itemCount;
+                document.getElementById('cartText').textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
+                document.getElementById('cartBarTotal').textContent = '₦' + formatNumber(total);
+            } else {
+                cartBar.style.display = 'none';
+            }
+
+            // Update cart modal
+            const cartItemsContainer = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-basket"></i>
+                        <p>Your cart is empty</p>
+                    </div>
+                `;
+            } else {
+                cartItemsContainer.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h4>${escapeHtml(item.name)}</h4>
+                            <p>₦${formatNumber(item.price)} × ${item.quantity}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button onclick="updateCartItem(${item.id}, -1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateCartItem(${item.id}, 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="cart-item-total">₦${formatNumber(item.price * item.quantity)}</div>
+                    </div>
+                `).join('');
+            }
+
+            updateCartSummary();
+        }
+
+        // Update cart item quantity
+        function updateCartItem(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            const newQty = item.quantity + delta;
+            if (newQty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            } else if (newQty > item.maxStock) {
+                showNotification('Not enough stock!', 'error');
+                return;
+            } else {
+                item.quantity = newQty;
+            }
+
+            updateCartUI();
+            renderProducts();
+        }
+
+        // Update cart summary
+        function updateCartSummary() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const discount = parseFloat(document.getElementById('cartDiscount').value) || 0;
+            const total = Math.max(0, subtotal - discount);
+            
+            document.getElementById('cartSubtotal').textContent = '₦' + formatNumber(subtotal);
+            document.getElementById('cartGrandTotal').textContent = '₦' + formatNumber(total);
+        }
+
+        // Show cart modal
+        function showCartModal() {
+            if (cart.length === 0) {
+                showNotification('Cart is empty!', 'info');
+                return;
+            }
+            document.getElementById('cartModal').classList.add('active');
+        }
+
+        // Close cart modal
+        function closeCartModal() {
+            document.getElementById('cartModal').classList.remove('active');
+        }
+
+        // Set payment method
+        function setPaymentMethod(method) {
+            currentPaymentMethod = method;
+            document.querySelectorAll('.payment-method').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.method === method) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Complete sale
+        function completeSale() {
+            if (cart.length === 0) return;
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const discount = parseFloat(document.getElementById('cartDiscount').value) || 0;
+            const total = Math.max(0, subtotal - discount);
+
+            // Create sale record
+            const sale = {
+                id: Date.now(),
+                customer: selectedCustomer ? selectedCustomer.name : 'Walk-in Customer',
+                customerId: selectedCustomer ? selectedCustomer.id : null,
+                items: cart.map(item => ({
+                    productId: item.id,
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                    costPrice: item.costPrice
+                })),
+                subtotal: subtotal,
+                discount: discount,
+                total: total,
+                paymentMethod: currentPaymentMethod,
+                date: new Date().toISOString(),
+                status: 'completed'
+            };
+
+            // Update inventory
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.id);
+                if (product) {
+                    product.quantity -= item.quantity;
+                }
+            });
+
+            // Update customer debt if credit
+            if (currentPaymentMethod === 'credit' && selectedCustomer) {
+                selectedCustomer.debt = (selectedCustomer.debt || 0) + total;
+                localStorage.setItem('customers', JSON.stringify(customers));
+            }
+
+            // Save sale
+            const sales = JSON.parse(localStorage.getItem('sales')) || [];
+            sales.push(sale);
+            localStorage.setItem('sales', JSON.stringify(sales));
+            localStorage.setItem('products', JSON.stringify(products));
+
+            // Clear cart
+            cart = [];
+            updateCartUI();
+            renderProducts();
+            closeCartModal();
+
+            // Show receipt
+            showReceipt(sale);
+        }
+
+        // Show receipt
+        function showReceipt(sale) {
+            const profit = sale.total - sale.items.reduce((sum, i) => sum + (i.costPrice * i.quantity), 0) - (sale.discount || 0);
+            
+            const receiptHtml = `
+                <div class="receipt-modal" id="receiptModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+                    <div class="receipt-content" style="background: white; width: 100%; max-width: 360px; border-radius: var(--radius-md); padding: 1.5rem; color: #333;">
+                        <div class="receipt-header" style="text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 1rem; margin-bottom: 1rem;">
+                            <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">Kasuwa Dan Goronyo</h2>
+                            <p>${new Date(sale.date).toLocaleString()}</p>
+                            <p>Receipt #: ${sale.id}</p>
+                        </div>
+                        <div class="receipt-items" style="margin-bottom: 1rem;">
+                            ${sale.items.map(item => `
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dotted #eee;">
+                                    <span>${escapeHtml(item.name)} × ${item.quantity}</span>
+                                    <span>₦${formatNumber(item.price * item.quantity)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="receipt-summary" style="border-top: 2px dashed #ccc; border-bottom: 2px dashed #ccc; padding: 1rem 0; margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Subtotal</span>
+                                <span>₦${formatNumber(sale.subtotal)}</span>
+                            </div>
+                            ${sale.discount > 0 ? `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Discount</span>
+                                <span>-₦${formatNumber(sale.discount)}</span>
+                            </div>
+                            ` : ''}
+                            <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; border-top: 1px solid #eee; padding-top: 0.5rem; margin-top: 0.5rem;">
+                                <span>TOTAL</span>
+                                <span>₦${formatNumber(sale.total)}</span>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-bottom: 1rem;">
+                            <p>Payment: ${sale.paymentMethod.toUpperCase()}</p>
+                            <p>Thank you for your business!</p>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button onclick="document.getElementById('receiptModal').remove(); showNotification('Sale completed!', 'success');" class="btn-secondary" style="flex: 1;">Close</button>
+                            <button onclick="window.print()" class="btn-primary" style="flex: 1;">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', receiptHtml);
+        }
+
+        // Customer functions
+        function showCustomerModal() {
+            renderCustomersList();
+            document.getElementById('customerModal').classList.add('active');
+        }
+
+        function closeCustomerModal() {
+            document.getElementById('customerModal').classList.remove('active');
+        }
+
+        function renderCustomersList() {
+            const container = document.getElementById('customersListModal');
+            const searchTerm = document.getElementById('customerSearch')?.value?.toLowerCase() || '';
+            
+            let filtered = customers;
+            if (searchTerm) {
+                filtered = customers.filter(c => c.name.toLowerCase().includes(searchTerm));
+            }
+
+            let html = `
+                <div class="customer-option" onclick="selectCustomer(null)" style="padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 40px; height: 40px; background: var(--bg-color); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-walking"></i>
+                    </div>
+                    <span>Walk-in Customer</span>
+                </div>
+            `;
+
+            html += filtered.map(c => `
+                <div class="customer-option" onclick="selectCustomer(${c.id})" 
+                     style="padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 40px; height: 40px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500;">${escapeHtml(c.name)}</div>
+                        ${c.debt > 0 ? `<div style="font-size: 0.8rem; color: var(--danger-color);">Debt: ₦${formatNumber(c.debt)}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function selectCustomer(customerId) {
+            if (customerId === null) {
+                selectedCustomer = null;
+                document.getElementById('selectedCustomerName').textContent = 'Walk-in Customer';
+                document.getElementById('selectedCustomerInfo').textContent = 'Tap to select customer';
+            } else {
+                selectedCustomer = customers.find(c => c.id === customerId);
+                document.getElementById('selectedCustomerName').textContent = selectedCustomer.name;
+                document.getElementById('selectedCustomerInfo').textContent = selectedCustomer.phone || 'No phone';
+            }
+            closeCustomerModal();
+        }
+
+        function quickAddCustomer() {
+            const name = prompt('Enter customer name:');
+            if (!name) return;
+            
+            const phone = prompt('Enter phone number (optional):');
+            
+            const customer = {
+                id: Date.now(),
+                name: name,
+                phone: phone || '',
+                debt: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            customers.push(customer);
+            localStorage.setItem('customers', JSON.stringify(customers));
+            
+            selectCustomer(customer.id);
+            showNotification('Customer added!', 'success');
+        }
+
+        // Clear cart
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (!confirm('Clear all items from cart?')) return;
+            
+            cart = [];
+            updateCartUI();
+            renderProducts();
+            showNotification('Cart cleared', 'info');
+        }
+
+        // Barcode scan
+        function startBarcodeScan() {
+            showNotification('Barcode scanner coming soon!', 'info');
+        }
+
+        // Go to stock
+        function goToStock() {
+            window.location.href = 'stock.html';
+        }
+
+        // Go back
+        function goBack() {
+            window.history.back();
+        }
+
+        // Format number
+        function formatNumber(num) {
+            return parseFloat(num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

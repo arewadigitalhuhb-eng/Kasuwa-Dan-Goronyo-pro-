@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>Kasuwa Dan Goronyo - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Dashboard Specific Styles */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            margin: -1rem -1rem 1.5rem;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .dashboard-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .greeting h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .greeting p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .notification-bell {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .notification-bell:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .notification-bell i {
+            font-size: 1.25rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Quick Action Button */
+        .quick-action-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .quick-action-card:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .quick-action-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(26, 95, 42, 0.1);
+            color: var(--primary-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .quick-action-text {
+            flex: 1;
+        }
+
+        .quick-action-text h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .quick-action-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .quick-action-arrow {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stat-card.products::before { background: var(--info-color); }
+        .stat-card.sales::before { background: var(--success-color); }
+        .stat-card.profit::before { background: var(--secondary-color); }
+        .stat-card.inventory::before { background: var(--primary-color); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-card.products .stat-icon-box { background: rgba(52, 152, 219, 0.1); color: var(--info-color); }
+        .stat-card.sales .stat-icon-box { background: rgba(39, 174, 96, 0.1); color: var(--success-color); }
+        .stat-card.profit .stat-icon-box { background: rgba(243, 156, 18, 0.1); color: var(--secondary-color); }
+        .stat-card.inventory .stat-icon-box { background: rgba(26, 95, 42, 0.1); color: var(--primary-color); }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .stat-trend.up {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-trend.down {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Alert Section */
+        .alert-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            background: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .alert-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-card.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-card.warning {
+            border-left: 4px solid var(--warning-color);
+            background: #fffbeb;
+        }
+
+        .alert-card.danger {
+            border-left: 4px solid var(--danger-color);
+            background: #fef2f2;
+        }
+
+        .alert-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .alert-card.success .alert-icon-box { background: rgba(39, 174, 96, 0.1); color: var(--success-color); }
+        .alert-card.warning .alert-icon-box { background: rgba(241, 196, 15, 0.1); color: var(--warning-color); }
+        .alert-card.danger .alert-icon-box { background: rgba(231, 76, 60, 0.1); color: var(--danger-color); }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-content p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .alert-arrow {
+            color: var(--text-muted);
+        }
+
+        /* Recent Sales Section */
+        .recent-sales-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-header-flex h2 {
+            font-size: 1.1rem;
+        }
+
+        .view-all-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .sales-list {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sale-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sale-item:last-child {
+            border-bottom: none;
+        }
+
+        .sale-item:hover {
+            background: rgba(0,0,0,0.02);
+        }
+
+        .sale-avatar {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            margin-right: 1rem;
+        }
+
+        .sale-info {
+            flex: 1;
+        }
+
+        .sale-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .sale-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .sale-amount {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .empty-sales {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-sales i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Quick Links Grid */
+        .quick-links-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-link-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-link-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .quick-link-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .quick-link-item:nth-child(1) .quick-link-icon { background: rgba(26, 95, 42, 0.1); color: var(--primary-color); }
+        .quick-link-item:nth-child(2) .quick-link-icon { background: rgba(52, 152, 219, 0.1); color: var(--info-color); }
+        .quick-link-item:nth-child(3) .quick-link-icon { background: rgba(243, 156, 18, 0.1); color: var(--secondary-color); }
+        .quick-link-item:nth-child(4) .quick-link-icon { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
+
+        .quick-link-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Pro Banner */
+        .pro-banner {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .pro-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .pro-content {
+            flex: 1;
+        }
+
+        .pro-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pro-content p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .pro-btn {
+            background: white;
+            color: #764ba2;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h3 id="userName">Mallam Abdullahi</h3>
+                        <p>Store Owner</p>
+                    </div>
+                </div>
+                <button class="close-sidebar" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="stock.html">
+                        <i class="fas fa-boxes"></i>
+                        <span>Stock</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="sale.html">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Sale</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="history.html">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="categories.html">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="customers.html">
+                        <i class="fas fa-users"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="settings.html">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="header-content" style="display: flex; justify-content: space-between; align-items: center; padding: 0 0.5rem;">
+                    <button class="icon-btn menu-btn" onclick="toggleSidebar()" style="background: rgba(255,255,255,0.2);">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="notification-bell" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notifBadge">3</span>
+                    </div>
+                </div>
+                <div class="greeting" style="margin-top: 1rem; padding: 0 0.5rem;">
+                    <h1 id="welcomeText">Welcome back!</h1>
+                    <p id="dateDisplay">Today is...</p>
+                </div>
+            </div>
+
+            <!-- Quick Action -->
+            <div class="quick-action-card" onclick="goToSale()">
+                <div class="quick-action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="quick-action-text">
+                    <h3>New Sale</h3>
+                    <p>Create a new transaction</p>
+                </div>
+                <i class="fas fa-chevron-right quick-action-arrow"></i>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="quick-links-grid">
+                <a href="stock.html" class="quick-link-item">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <span class="quick-link-label">Stock</span>
+                </a>
+                <a href="categories.html" class="quick-link-item">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <span class="quick-link-label">Categories</span>
+                </a>
+                <a href="customers.html" class="quick-link-item">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <span class="quick-link-label">Customers</span>
+                </a>
+                <a href="history.html" class="quick-link-item">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <span class="quick-link-label">Reports</span>
+                </a>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card products" onclick="goToStock()">
+                    <div class="stat-header">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <span class="stat-trend up" id="productsTrend">
+                            <i class="fas fa-arrow-up"></i> 12%
+                        </span>
+                    </div>
+                    <div class="stat-value" id="totalProducts">0</div>
+                    <div class="stat-label">Products</div>
+                </div>
+
+                <div class="stat-card sales" onclick="goToHistory()">
+                    <div class="stat-header">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-naira-sign"></i>
+                        </div>
+                        <span class="stat-trend up" id="salesTrend">
+                            <i class="fas fa-arrow-up"></i> 8%
+                        </span>
+                    </div>
+                    <div class="stat-value" id="todaySales">₦0.00</div>
+                    <div class="stat-label">Today's Sales</div>
+                </div>
+
+                <div class="stat-card profit" onclick="goToHistory()">
+                    <div class="stat-header">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="stat-trend up" id="profitTrend">
+                            <i class="fas fa-arrow-up"></i> 15%
+                        </span>
+                    </div>
+                    <div class="stat-value" id="allTimeProfit">₦0.00</div>
+                    <div class="stat-label">All Time Profit</div>
+                </div>
+
+                <div class="stat-card inventory" onclick="goToStock()">
+                    <div class="stat-header">
+                        <div class="stat-icon-box">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <span class="stat-trend down" id="inventoryTrend">
+                            <i class="fas fa-arrow-down"></i> 3%
+                        </span>
+                    </div>
+                    <div class="stat-value" id="inventoryValue">₦0.00</div>
+                    <div class="stat-label">Inventory Value</div>
+                </div>
+            </div>
+
+            <!-- Low Stock Alert -->
+            <div class="alert-section" id="stockAlert">
+                <div class="alert-card success" onclick="goToStock()">
+                    <div class="alert-icon-box">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h4>Stock Status</h4>
+                        <p>All stocked up! No low stock alerts.</p>
+                    </div>
+                    <i class="fas fa-chevron-right alert-arrow"></i>
+                </div>
+            </div>
+
+            <!-- Recent Sales -->
+            <div class="recent-sales-section">
+                <div class="section-header-flex">
+                    <h2>Recent Sales</h2>
+                    <a href="history.html" class="view-all-link">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="sales-list" id="recentSalesList">
+                    <div class="empty-sales">
+                        <i class="fas fa-receipt"></i>
+                        <p>No sales yet today</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Banner -->
+            <div class="pro-banner">
+                <div class="pro-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="pro-content">
+                    <h4>Upgrade to Pro</h4>
+                    <p>Get advanced analytics & more</p>
+                </div>
+                <button class="pro-btn" onclick="upgradePro()">Upgrade</button>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-link active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="stock.html" class="nav-link">
+                <i class="fas fa-boxes"></i>
+                <span>Stock</span>
+            </a>
+            <a href="sale.html" class="nav-link sale-link">
+                <div class="sale-circle">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span>Sale</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+        });
+
+        function initializeDashboard() {
+            loadUserData();
+            loadDashboardData();
+            setupPullToRefresh();
+            updateDateDisplay();
+        }
+
+        function updateDateDisplay() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-NG', options);
+        }
+
+        function loadUserData() {
+            const user = JSON.parse(localStorage.getItem('user')) || { 
+                name: 'Mallam Abdullahi',
+                storeName: 'Kasuwa Dan Goronyo'
+            };
+            
+            document.getElementById('userName').textContent = user.name;
+            
+            const firstName = user.name.split(' ')[0];
+            document.getElementById('welcomeText').textContent = `Welcome back, ${firstName}!`;
+        }
+
+        function loadDashboardData() {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const sales = JSON.parse(localStorage.getItem('sales')) || [];
+            
+            // Update products count
+            document.getElementById('totalProducts').textContent = products.length;
+            
+            // Calculate today's sales
+            const today = new Date().toDateString();
+            const todaySales = sales.filter(s => new Date(s.date).toDateString() === today);
+            const todayTotal = todaySales.reduce((sum, s) => sum + (parseFloat(s.total) || 0), 0);
+            document.getElementById('todaySales').textContent = formatCurrency(todayTotal);
+            
+            // Calculate all time profit
+            const totalProfit = sales.reduce((sum, s) => {
+                const cost = (s.items || []).reduce((c, i) => {
+                    return c + ((parseFloat(i.costPrice) || 0) * (parseInt(i.quantity) || 0));
+                }, 0);
+                return sum + ((parseFloat(s.total) || 0) - cost - (parseFloat(s.discount) || 0));
+            }, 0);
+            document.getElementById('allTimeProfit').textContent = formatCurrency(totalProfit);
+            
+            // Calculate inventory value
+            const inventoryValue = products.reduce((sum, p) => {
+                return sum + ((parseFloat(p.costPrice) || 0) * (parseInt(p.quantity) || 0));
+            }, 0);
+            document.getElementById('inventoryValue').textContent = formatCurrency(inventoryValue);
+            
+            // Check low stock
+            checkLowStock(products);
+            
+            // Load recent sales
+            loadRecentSales(sales);
+        }
+
+        function checkLowStock(products) {
+            const lowStock = products.filter(p => {
+                const qty = parseInt(p.quantity) || 0;
+                const alert = parseInt(p.lowStockAlert) || 10;
+                return qty <= alert && qty > 0;
+            });
+            
+            const outOfStock = products.filter(p => (parseInt(p.quantity) || 0) === 0);
+            
+            const alertSection = document.getElementById('stockAlert');
+            
+            if (outOfStock.length > 0) {
+                alertSection.innerHTML = `
+                    <div class="alert-card danger" onclick="goToStock()" style="cursor: pointer;">
+                        <div class="alert-icon-box">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Out of Stock Alert</h4>
+                            <p>${outOfStock.length} product(s) are out of stock!</p>
+                        </div>
+                        <i class="fas fa-chevron-right alert-arrow"></i>
+                    </div>
+                `;
+            } else if (lowStock.length > 0) {
+                alertSection.innerHTML = `
+                    <div class="alert-card warning" onclick="goToStock()" style="cursor: pointer;">
+                        <div class="alert-icon-box">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Low Stock Alert</h4>
+                            <p>${lowStock.length} product(s) running low. Tap to view.</p>
+                        </div>
+                        <i class="fas fa-chevron-right alert-arrow"></i>
+                    </div>
+                `;
+            } else {
+                alertSection.innerHTML = `
+                    <div class="alert-card success" onclick="goToStock()" style="cursor: pointer;">
+                        <div class="alert-icon-box">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Stock Status</h4>
+                            <p>All stocked up! No low stock alerts.</p>
+                        </div>
+                        <i class="fas fa-chevron-right alert-arrow"></i>
+                    </div>
+                `;
+            }
+        }
+
+        function loadRecentSales(sales) {
+            const container = document.getElementById('recentSalesList');
+            
+            // Get last 5 sales
+            const recentSales = sales.slice(-5).reverse();
+            
+            if (recentSales.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-sales">
+                        <i class="fas fa-receipt"></i>
+                        <p>No sales yet today</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = recentSales.map(sale => `
+                <div class="sale-item" onclick="viewSaleDetail(${sale.id})">
+                    <div class="sale-avatar">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="sale-info">
+                        <h4>${escapeHtml(sale.customer || 'Walk-in Customer')}</h4>
+                        <p>${formatTime(sale.date)} • ${sale.items ? sale.items.length : 0} items</p>
+                    </div>
+                    <div class="sale-amount">${formatCurrency(sale.total)}</div>
+                </div>
+            `).join('');
+        }
+
+        function setupPullToRefresh() {
+            let touchStartY = 0;
+            let touchEndY = 0;
+            const mainContent = document.querySelector('.main-content');
+            
+            if (!mainContent) return;
+            
+            mainContent.addEventListener('touchstart', e => {
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            mainContent.addEventListener('touchend', e => {
+                touchEndY = e.changedTouches[0].screenY;
+                if (touchEndY > touchStartY + 100 && window.scrollY === 0) {
+                    showNotification('🔄 Refreshing...', 'info');
+                    setTimeout(() => {
+                        loadDashboardData();
+                        showNotification('✅ Updated!', 'success');
+                    }, 1000);
+                }
+            }, { passive: true });
+        }
+
+        // Navigation functions
+        function goToSale() {
+            window.location.href = 'sale.html';
+        }
+
+        function goToStock() {
+            window.location.href = 'stock.html';
+        }
+
+        function goToHistory() {
+            window.location.href = 'history.html';
+        }
+
+        function viewSaleDetail(saleId) {
+            localStorage.setItem('viewSaleId', saleId);
+            window.location.href = 'history.html';
+        }
+
+        function showNotifications() {
+            showNotification('No new notifications', 'info');
+        }
+
+        function upgradePro() {
+            showNotification('🚀 Pro upgrade coming soon!', 'info');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                showNotification('👋 Logged out successfully!', 'success');
+                setTimeout(() => {
+                    localStorage.removeItem('currentSession');
+                    window.location.reload();
+                }, 1500);
+            }
+        }
+
+        // Utility functions
+        function formatCurrency(amount) {
+            const currency = JSON.parse(localStorage.getItem('user'))?.currency || '₦';
+            return currency + parseFloat(amount || 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        function formatTime(dateString) {
+            if (!dateString) return '';
+            return new Date(dateString).toLocaleTimeString('en-NG', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

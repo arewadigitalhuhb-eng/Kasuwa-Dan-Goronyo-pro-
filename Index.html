@@ -180,7 +180,7 @@
 
         .stat-card.products .stat-icon-box { background: rgba(52, 152, 219, 0.1); color: var(--info-color); }
         .stat-card.sales .stat-icon-box { background: rgba(39, 174, 96, 0.1); color: var(--success-color); }
-        .stat-card.profit .statz-icon-box { background: rgba(243, 156, 18, 0.1); color: var(--secondary-color); }
+        .stat-card.profit .stat-icon-box { background: rgba(243, 156, 18, 0.1); color: var(--secondary-color); }
         .stat-card.inventory .stat-icon-box { background: rgba(26, 95, 42, 0.1); color: var(--primary-color); }
 
         .stat-trend {
@@ -492,7 +492,7 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item active">
-                    <a href="dashboard.html">
+                    <a href="index.html">
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
@@ -502,18 +502,6 @@
                         <i class="fas fa-boxes"></i>
                         <span>Stock</span>
                     </a>
-                </li>
-                <li class="nav-item">
-                <a href="customers.html">
-                <i class="fas fa-boxes"></i>
-                <span>customers</span>
-        </a>
-</li>
-                <li class="nav-item">
-                        <a href="profile.html">
-                                <i class="fas fa-boxes"></i>
-                                <span>profile</span>
-                        </a>
                 </li>
                 <li class="nav-item">
                     <a href="sale.html">
@@ -601,7 +589,12 @@
                     </div>
                     <span class="quick-link-label">Categories</span>
                 </a>
-              
+                <a href="customers.html" class="quick-link-item">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <span class="quick-link-label">Customers</span>
+                </a>
                 <a href="history.html" class="quick-link-item">
                     <div class="quick-link-icon">
                         <i class="fas fa-chart-bar"></i>
@@ -931,7 +924,17 @@
 
         function upgradePro() {
             showNotification('🚀 Pro upgrade coming soon!', 'info');
-        }a
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                showNotification('👋 Logged out successfully!', 'success');
+                setTimeout(() => {
+                    localStorage.removeItem('currentSession');
+                    window.location.reload();
+                }, 1500);
+            }
+        }
 
         // Utility functions
         function formatCurrency(amount) {

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>Stock - Kasuwa Dan Goronyo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles for category dropdown with images */
+        .category-select-wrapper {
+            position: relative;
+        }
+
+        .category-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-dropdown.active {
+            display: block;
+        }
+
+        .category-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-option:hover {
+            background: rgba(26, 95, 42, 0.05);
+        }
+
+        .category-option.selected {
+            background: rgba(26, 95, 42, 0.1);
+        }
+
+        .category-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        }
+
+        .category-thumb-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .category-option-info {
+            flex: 1;
+        }
+
+        .category-option-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .category-option-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .selected-category-display {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .selected-category-display:hover {
+            border-color: var(--primary-color);
+        }
+
+        .selected-category-display i {
+            margin-left: auto;
+            color: var(--text-secondary);
+        }
+
+        /* Quick category chips */
+        .category-chips-scroll {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .category-chip-with-image {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-chip-with-image.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chip-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chip-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <button class="icon-btn back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="logo">
+                    <span>Stock Management</span>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="showAddProductModal()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="icon-btn menu-btn" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h3 id="userName">Mallam Abdullahi</h3>
+                        <p>Store Owner</p>
+                    </div>
+                </div>
+                <button class="close-sidebar" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="stock.html">
+                        <i class="fas fa-boxes"></i>
+                        <span>Stock</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="sale.html">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Sale</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="history.html">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="settings.html">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Bar -->
+            <section class="search-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchStock" placeholder="Search products..." onkeyup="searchProducts()">
+                </div>
+                <button class="filter-btn" onclick="toggleFilter()">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </section>
+
+            <!-- Category Chips (Quick Filter) -->
+            <section class="categories-section">
+                <div class="category-chips-scroll" id="categoryChips">
+                    <button class="category-chip-with-image active" onclick="filterCategory('all')">
+                        <span>All</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Stock Stats -->
+            <section class="stock-stats">
+                <div class="stat-card">
+                    <h4 id="totalStockItems">0</h4>
+                    <p>Total Items</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="lowStockCount">0</h4>
+                    <p>Low Stock</p>
+                </div>
+                <div class="stat-card">
+                    <h4 id="outOfStockCount">0</h4>
+                    <p>Out of Stock</p>
+                </div>
+            </section>
+
+            <!-- Products List -->
+            <section class="products-section">
+                <div class="section-header">
+                    <h2>Products</h2>
+                    <button class="sort-btn" onclick="toggleSort()">
+                        <i class="fas fa-sort"></i>
+                    </button>
+                </div>
+                <div class="products-list" id="productsList">
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>No products yet</p>
+                        <button class="btn-primary" onclick="showAddProductModal()">Add Product</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Add Product Modal -->
+        <div class="modal" id="addProductModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Product</h3>
+                    <button class="close-btn" onclick="closeAddProductModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="addProductForm" onsubmit="saveProduct(event)">
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" id="productName" required placeholder="e.g., Rice 50kg">
+                    </div>
+                    
+                    <!-- Category Select with Images -->
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <div class="category-select-wrapper">
+                            <div class="selected-category-display" onclick="toggleCategoryDropdown()">
+                                <div class="category-thumb-placeholder" id="selectedCatThumb">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <span id="selectedCatName">Select Category</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-dropdown" id="categoryDropdown">
+                                <!-- Dynamic categories -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="productCategory" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantity *</label>
+                            <input type="number" id="productQuantity" required min="0" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Low Stock Alert</label>
+                            <input type="number" id="productLowStock" min="1" value="10">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cost Price (₦) *</label>
+                            <input type="number" id="productCostPrice" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Selling Price (₦) *</label>
+                            <input type="number" id="productSellingPrice" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Barcode (Optional)</label>
+                        <input type="text" id="productBarcode" placeholder="Scan or enter barcode">
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddProductModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Product Modal -->
+        <div class="modal" id="editProductModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Product</h3>
+                    <button class="close-btn" onclick="closeEditProductModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="editProductForm" onsubmit="updateProduct(event)">
+                    <input type="hidden" id="editProductId">
+                    
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" id="editProductName" required>
+                    </div>
+                    
+                    <!-- Category Select with Images -->
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <div class="category-select-wrapper">
+                            <div class="selected-category-display" onclick="toggleEditCategoryDropdown()">
+                                <div class="category-thumb-placeholder" id="editSelectedCatThumb">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <span id="editSelectedCatName">Select Category</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="category-dropdown" id="editCategoryDropdown">
+                                <!-- Dynamic categories -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="editProductCategory" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantity *</label>
+                            <input type="number" id="editProductQuantity" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Low Stock Alert</label>
+                            <input type="number" id="editProductLowStock" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cost Price (₦) *</label>
+                            <input type="number" id="editProductCostPrice" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Selling Price (₦) *</label>
+                            <input type="number" id="editProductSellingPrice" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Barcode</label>
+                        <input type="text" id="editProductBarcode">
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-danger" onclick="deleteProduct()">Delete</button>
+                        <button type="submit" class="btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="stock.html" class="nav-link active">
+                <i class="fas fa-boxes"></i>
+                <span>Stock</span>
+            </a>
+            <a href="sale.html" class="nav-link sale-link">
+                <div class="sale-circle">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span>Sale</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentProducts = [];
+        let currentCategory = 'all';
+        let categories = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            loadCategories();
+            loadProducts();
+            setupPullToRefresh();
+            
+            // Check for preselected category
+            const preselected = localStorage.getItem('selectedCategory');
+            if (preselected) {
+                currentCategory = preselected;
+                localStorage.removeItem('selectedCategory');
+            }
+        });
+
+        // Load categories from localStorage
+        function loadCategories() {
+            try {
+                categories = JSON.parse(localStorage.getItem('categories')) || [];
+                
+                // If no categories, create defaults
+                if (categories.length === 0) {
+                    categories = [
+                        { id: 1, name: 'Grains', image: null },
+                        { id: 2, name: 'Oils', image: null },
+                        { id: 3, name: 'Spices', image: null },
+                        { id: 4, name: 'Beverages', image: null },
+                        { id: 5, name: 'Others', image: null }
+                    ];
+                    localStorage.setItem('categories', JSON.stringify(categories));
+                }
+                
+                renderCategoryChips();
+                renderCategoryDropdowns();
+            } catch (e) {
+                console.error('Error loading categories:', e);
+                categories = [];
+            }
+        }
+
+        // Render category chips
+        function renderCategoryChips() {
+            const container = document.getElementById('categoryChips');
+            
+            let html = `
+                <button class="category-chip-with-image ${currentCategory === 'all' ? 'active' : ''}" onclick="filterCategory('all')">
+                    <span>All</span>
+                </button>
+            `;
+            
+            categories.forEach(cat => {
+                const isActive = currentCategory === cat.name;
+                const hasImage = cat.image;
+                
+                html += `
+                    <button class="category-chip-with-image ${isActive ? 'active' : ''}" onclick="filterCategory('${escapeHtml(cat.name)}')">
+                        ${hasImage ? `
+                            <img src="${cat.image}" class="chip-thumb" onerror="this.style.display='none'">
+                        ` : `
+                            <div class="chip-icon"><i class="fas fa-tag"></i></div>
+                        `}
+                        <span>${escapeHtml(cat.name)}</span>
+                    </button>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Render category dropdowns for both add and edit modals
+        function renderCategoryDropdowns() {
+            renderDropdown('categoryDropdown', 'productCategory', 'selectedCatName', 'selectedCatThumb');
+            renderDropdown('editCategoryDropdown', 'editProductCategory', 'editSelectedCatName', 'editSelectedCatThumb');
+        }
+
+        function renderDropdown(dropdownId, inputId, nameId, thumbId) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            
+            dropdown.innerHTML = categories.map(cat => {
+                const count = currentProducts.filter(p => p.category === cat.name).length;
+                
+                return `
+                    <div class="category-option" onclick="selectCategory('${dropdownId}', '${inputId}', '${nameId}', '${thumbId}', '${escapeHtml(cat.name)}', '${cat.image || ''}')">
+                        ${cat.image ? `
+                            <img src="${cat.image}" class="category-thumb" onerror="this.outerHTML='<div class=\\'category-thumb-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'">
+                        ` : `
+                            <div class="category-thumb-placeholder"><i class="fas fa-folder"></i></div>
+                        `}
+                        <div class="category-option-info">
+                            <div class="category-option-name">${escapeHtml(cat.name)}</div>
+                            <div class="category-option-count">${count} products</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle dropdown
+        function toggleCategoryDropdown() {
+            const dropdown = document.getElementById('categoryDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function toggleEditCategoryDropdown() {
+            const dropdown = document.getElementById('editCategoryDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Select category
+        function selectCategory(dropdownId, inputId, nameId, thumbId, name, image) {
+            // Set hidden input
+            document.getElementById(inputId).value = name;
+            
+            // Update display
+            document.getElementById(nameId).textContent = name;
+            
+            const thumbEl = document.getElementById(thumbId);
+            if (image) {
+                thumbEl.innerHTML = `<img src="${image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">`;
+            } else {
+                thumbEl.innerHTML = `<i class="fas fa-folder"></i>`;
+            }
+            
+            // Close dropdown
+            document.getElementById(dropdownId).classList.remove('active');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.category-select-wrapper')) {
+                document.querySelectorAll('.category-dropdown').forEach(d => d.classList.remove('active'));
+            }
+        });
+
+        // Load products
+        function loadProducts() {
+            currentProducts = JSON.parse(localStorage.getItem('products')) || [];
+            renderProducts();
+            updateStockStats();
+        }
+
+        // Render products
+        function renderProducts() {
+            const container = document.getElementById('productsList');
+            let filtered = currentCategory === 'all' 
+                ? currentProducts 
+                : currentProducts.filter(p => p.category === currentCategory);
+            
+            const searchTerm = document.getElementById('searchStock').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) ||
+                    (p.category && p.category.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>${currentCategory === 'all' ? 'No products yet' : 'No products in this category'}</p>
+                        ${currentCategory !== 'all' ? `<button class="btn-primary" onclick="showAddProductModal()">Add to ${escapeHtml(currentCategory)}</button>` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(product => {
+                const isLowStock = product.quantity <= (product.lowStockAlert || 10);
+                const isOutOfStock = product.quantity === 0;
+                let statusClass = '';
+                let statusIcon = '';
+                
+                if (isOutOfStock) {
+                    statusClass = 'out-of-stock';
+                    statusIcon = '<i class="fas fa-times-circle"></i>';
+                } else if (isLowStock) {
+                    statusClass = 'low-stock';
+                    statusIcon = '<i class="fas fa-exclamation-circle"></i>';
+                } else {
+                    statusClass = 'in-stock';
+                    statusIcon = '<i class="fas fa-check-circle"></i>';
+                }
+
+                return `
+                    <div class="product-card ${statusClass}" onclick="editProduct(${product.id})">
+                        <div class="product-info">
+                            <h4>${escapeHtml(product.name)}</h4>
+                            <p>${escapeHtml(product.category || 'Uncategorized')} • ${statusIcon} ${product.quantity} in stock</p>
+                        </div>
+                        <div class="product-prices">
+                            <span class="selling-price">₦${formatNumber(product.sellingPrice)}</span>
+                            <span class="cost-price">Cost: ₦${formatNumber(product.costPrice)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter by category
+        function filterCategory(category) {
+            currentCategory = category;
+            renderCategoryChips();
+            renderProducts();
+        }
+
+        // Search products
+        function searchProducts() {
+            renderProducts();
+        }
+
+        // Update stats
+        function updateStockStats() {
+            const total = currentProducts.length;
+            const lowStock = currentProducts.filter(p => p.quantity <= (p.lowStockAlert || 10) && p.quantity > 0).length;
+            const outOfStock = currentProducts.filter(p => p.quantity === 0).length;
+            
+            document.getElementById('totalStockItems').textContent = total;
+            document.getElementById('lowStockCount').textContent = lowStock;
+            document.getElementById('outOfStockCount').textContent = outOfStock;
+        }
+
+        // Show add modal
+        function showAddProductModal() {
+            document.getElementById('addProductModal').classList.add('active');
+            
+            // Pre-select current category if not 'all'
+            if (currentCategory !== 'all') {
+                const cat = categories.find(c => c.name === currentCategory);
+                if (cat) {
+                    selectCategory('categoryDropdown', 'productCategory', 'selectedCatName', 'selectedCatThumb', cat.name, cat.image);
+                }
+            }
+            
+            // Refresh dropdowns to get latest categories
+            renderCategoryDropdowns();
+        }
+
+        // Close add modal
+        function closeAddProductModal() {
+            document.getElementById('addProductModal').classList.remove('active');
+            document.getElementById('addProductForm').reset();
+            document.getElementById('selectedCatName').textContent = 'Select Category';
+            document.getElementById('selectedCatThumb').innerHTML = '<i class="fas fa-folder"></i>';
+            document.getElementById('productCategory').value = '';
+        }
+
+        // Save product
+        function saveProduct(e) {
+            e.preventDefault();
+            
+            const category = document.getElementById('productCategory').value;
+            if (!category) {
+                showNotification('Please select a category', 'error');
+                return;
+            }
+
+            const product = {
+                id: Date.now(),
+                name: document.getElementById('productName').value.trim(),
+                category: category,
+                quantity: parseInt(document.getElementById('productQuantity').value) || 0,
+                costPrice: parseFloat(document.getElementById('productCostPrice').value) || 0,
+                sellingPrice: parseFloat(document.getElementById('productSellingPrice').value) || 0,
+                lowStockAlert: parseInt(document.getElementById('productLowStock').value) || 10,
+                barcode: document.getElementById('productBarcode').value.trim(),
+                createdAt: new Date().toISOString()
+            };
+
+            currentProducts.push(product);
+            localStorage.setItem('products', JSON.stringify(currentProducts));
+            
+            closeAddProductModal();
+            loadProducts();
+            showNotification('Product added successfully!', 'success');
+        }
+
+        // Edit product
+        function editProduct(id) {
+            const product = currentProducts.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById('editProductId').value = product.id;
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductQuantity').value = product.quantity;
+            document.getElementById('editProductCostPrice').value = product.costPrice;
+            document.getElementById('editProductSellingPrice').value = product.sellingPrice;
+            document.getElementById('editProductLowStock').value = product.lowStockAlert || 10;
+            document.getElementById('editProductBarcode').value = product.barcode || '';
+            
+            // Set category
+            const cat = categories.find(c => c.name === product.category);
+            selectCategory('editCategoryDropdown', 'editProductCategory', 'editSelectedCatName', 'editSelectedCatThumb', 
+                product.category, cat ? cat.image : '');
+            
+            document.getElementById('editProductModal').classList.add('active');
+        }
+
+        // Close edit modal
+        function closeEditProductModal() {
+            document.getElementById('editProductModal').classList.remove('active');
+        }
+
+        // Update product
+        function updateProduct(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('editProductId').value);
+            const index = currentProducts.findIndex(p => p.id === id);
+            
+            if (index === -1) return;
+
+            const category = document.getElementById('editProductCategory').value;
+            if (!category) {
+                showNotification('Please select a category', 'error');
+                return;
+            }
+
+            currentProducts[index] = {
+                ...currentProducts[index],
+                name: document.getElementById('editProductName').value.trim(),
+                category: category,
+                quantity: parseInt(document.getElementById('editProductQuantity').value) || 0,
+                costPrice: parseFloat(document.getElementById('editProductCostPrice').value) || 0,
+                sellingPrice: parseFloat(document.getElementById('editProductSellingPrice').value) || 0,
+                lowStockAlert: parseInt(document.getElementById('editProductLowStock').value) || 10,
+                barcode: document.getElementById('editProductBarcode').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('products', JSON.stringify(currentProducts));
+            closeEditProductModal();
+            loadProducts();
+            showNotification('Product updated successfully!', 'success');
+        }
+
+        // Delete product
+        function deleteProduct() {
+            const id = parseInt(document.getElementById('editProductId').value);
+            
+            if (confirm('Are you sure you want to delete this product?')) {
+                currentProducts = currentProducts.filter(p => p.id !== id);
+                localStorage.setItem('products', JSON.stringify(currentProducts));
+                closeEditProductModal();
+                loadProducts();
+                showNotification('Product deleted!', 'info');
+            }
+        }
+
+        // Toggle filter
+        function toggleFilter() {
+            showNotification('Advanced filters coming soon!', 'info');
+        }
+
+        // Toggle sort
+        function toggleSort() {
+            currentProducts.reverse();
+            renderProducts();
+        }
+
+        // Pull to refresh
+        function setupPullToRefresh() {
+            let touchStartY = 0;
+            let touchEndY = 0;
+            const mainContent = document.querySelector('.main-content');
+            
+            if (!mainContent) return;
+            
+            mainContent.addEventListener('touchstart', e => {
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            mainContent.addEventListener('touchend', e => {
+                touchEndY = e.changedTouches[0].screenY;
+                if (touchEndY > touchStartY + 100 && window.scrollY === 0) {
+                    showNotification('🔄 Refreshing...', 'info');
+                    setTimeout(() => {
+                        loadCategories();
+                        loadProducts();
+                        showNotification('✅ Updated!', 'success');
+                    }, 1000);
+                }
+            }, { passive: true });
+        }
+
+        // Format number
+        function formatNumber(num) {
+            return parseFloat(num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

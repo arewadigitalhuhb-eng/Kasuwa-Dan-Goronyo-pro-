@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>Categories - Kasuwa Dan Goronyo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles for gallery view */
+        .view-toggle {
+            display: flex;
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .view-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            background: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Gallery Grid View */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .gallery-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        }
+
+        .gallery-image-placeholder {
+            width: 100%;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: var(--text-muted);
+            font-size: 3rem;
+        }
+
+        .gallery-info {
+            padding: 1rem;
+        }
+
+        .gallery-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .product-count {
+            background: rgba(26, 95, 42, 0.1);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* List View (Alternative) */
+        .list-view {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .list-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .list-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .list-image {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .list-image-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: var(--text-muted);
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .list-info {
+            flex: 1;
+        }
+
+        .list-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .list-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Camera Upload Section */
+        .camera-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .camera-upload {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px dashed var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .camera-upload:hover {
+            border-color: var(--primary-color);
+            background: rgba(26, 95, 42, 0.02);
+        }
+
+        .camera-upload i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .camera-upload p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .camera-upload small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        #cameraInput {
+            display: none;
+        }
+
+        /* Image Preview Modal */
+        .image-preview-modal .modal-content {
+            background: black;
+            max-height: 100vh;
+            border-radius: 0;
+        }
+
+        .image-preview-container {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-preview-container img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .image-preview-actions {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .preview-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .preview-btn.retake {
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .preview-btn.confirm {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .preview-btn.cancel {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        /* Category Image in Modal */
+        .category-image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .image-action-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .image-action-btn.danger {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        /* Empty State for Gallery */
+        .gallery-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        /* Loading State */
+        .uploading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .uploading::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .uploading::before {
+            content: '\f110';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <button class="icon-btn back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="logo">
+                    <span>Categories</span>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="showAddCategoryModal()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setView('gallery')" id="galleryBtn">
+                    <i class="fas fa-th-large"></i>
+                    <span>Gallery</span>
+                </button>
+                <button class="view-btn" onclick="setView('list')" id="listBtn">
+                    <i class="fas fa-list"></i>
+                    <span>List</span>
+                </button>
+            </div>
+
+            <!-- Categories Container -->
+            <section class="categories-section" id="categoriesSection">
+                <div class="gallery-grid" id="categoriesGrid">
+                    <div class="gallery-empty">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <p>No categories yet</p>
+                        <button class="btn-primary" onclick="showAddCategoryModal()" style="margin-top: 1rem;">
+                            Add Category
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Add Category Modal -->
+        <div class="modal" id="addCategoryModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Category</h3>
+                    <button class="close-btn" onclick="closeAddCategoryModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="addCategoryForm" onsubmit="saveCategory(event)">
+                    <!-- Camera Upload Section -->
+                    <div class="camera-section">
+                        <div class="camera-upload" onclick="openCamera()">
+                            <i class="fas fa-camera"></i>
+                            <p>Tap to take photo</p>
+                            <small>or upload category image</small>
+                        </div>
+                        <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImageCapture(event)">
+                        
+                        <!-- Image Preview -->
+                        <div id="imagePreviewContainer" style="display: none;">
+                            <img id="categoryImagePreview" class="category-image-preview">
+                            <div class="image-actions">
+                                <button type="button" class="image-action-btn danger" onclick="clearImage()">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                                <button type="button" class="image-action-btn" onclick="openCamera()">
+                                    <i class="fas fa-camera"></i> Retake
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category Name *</label>
+                        <input type="text" id="categoryName" required placeholder="e.g., Electronics, Clothing...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="categoryDescription" rows="2" placeholder="Optional description"></textarea>
+                    </div>
+
+                    <input type="hidden" id="categoryImage" value="">
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAddCategoryModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Category Modal -->
+        <div class="modal" id="editCategoryModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Category</h3>
+                    <button class="close-btn" onclick="closeEditCategoryModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="editCategoryForm" onsubmit="updateCategory(event)">
+                    <input type="hidden" id="editCategoryId">
+                    
+                    <!-- Image Section -->
+                    <div class="camera-section">
+                        <div id="editImageContainer">
+                            <!-- Dynamic image content -->
+                        </div>
+                        <input type="file" id="editCameraInput" accept="image/*" capture="environment" onchange="handleEditImageCapture(event)" style="display: none;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category Name *</label>
+                        <input type="text" id="editCategoryName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="editCategoryDescription" rows="2"></textarea>
+                    </div>
+
+                    <input type="hidden" id="editCategoryImage" value="">
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-danger" onclick="deleteCurrentCategory()">Delete</button>
+                        <button type="submit" class="btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Image Preview Modal (for captured photo) -->
+        <div class="modal image-preview-modal" id="imagePreviewModal">
+            <div class="modal-content">
+                <div class="image-preview-container">
+                    <img id="previewImage" src="" alt="Preview">
+                    <div class="image-preview-actions">
+                        <button class="preview-btn cancel" onclick="cancelImage()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="preview-btn retake" onclick="retakeImage()">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="preview-btn confirm" onclick="confirmImage()">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="stock.html" class="nav-link">
+                <i class="fas fa-boxes"></i>
+                <span>Stock</span>
+            </a>
+            <a href="sale.html" class="nav-link sale-link">
+                <div class="sale-circle">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span>Sale</span>
+            </a>
+            <a href="history.html" class="nav-link">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Global variables
+        let categories = [];
+        let currentView = 'gallery';
+        let tempImageData = null;
+        let currentEditingId = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            loadProducts();
+        });
+
+        // Load categories from localStorage
+        function loadCategories() {
+            try {
+                categories = JSON.parse(localStorage.getItem('categories')) || [];
+                
+                // Migrate old categories without images
+                categories = categories.map(cat => ({
+                    ...cat,
+                    image: cat.image || null
+                }));
+                
+                renderCategories();
+            } catch (e) {
+                console.error('Error loading categories:', e);
+                categories = [];
+            }
+        }
+
+        // Load products for counting
+        let products = [];
+        function loadProducts() {
+            products = JSON.parse(localStorage.getItem('products')) || [];
+        }
+
+        // Get product count for category
+        function getProductCount(categoryName) {
+            return products.filter(p => p.category === categoryName).length;
+        }
+
+        // Set view mode (gallery or list)
+        function setView(view) {
+            currentView = view;
+            
+            // Update buttons
+            document.getElementById('galleryBtn').classList.toggle('active', view === 'gallery');
+            document.getElementById('listBtn').classList.toggle('active', view === 'list');
+            
+            renderCategories();
+        }
+
+        // Render categories based on current view
+        function renderCategories() {
+            const container = document.getElementById('categoriesGrid');
+            
+            if (categories.length === 0) {
+                container.innerHTML = `
+                    <div class="gallery-empty">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <p>No categories yet</p>
+                        <button class="btn-primary" onclick="showAddCategoryModal()" style="margin-top: 1rem;">
+                            Add Category
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            if (currentView === 'gallery') {
+                renderGalleryView(container);
+            } else {
+                renderListView(container);
+            }
+        }
+
+        // Render gallery grid view
+        function renderGalleryView(container) {
+            container.className = 'gallery-grid';
+            
+            container.innerHTML = categories.map(cat => {
+                const count = getProductCount(cat.name);
+                const imageHtml = cat.image 
+                    ? `<img src="${cat.image}" class="gallery-image" alt="${escapeHtml(cat.name)}" onerror="this.parentElement.innerHTML='<div class=\\'gallery-image-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'">`
+                    : `<div class="gallery-image-placeholder"><i class="fas fa-box"></i></div>`;
+                
+                return `
+                    <div class="gallery-card" onclick="viewCategory('${escapeHtml(cat.name)}')">
+                        ${imageHtml}
+                        <div class="gallery-info">
+                            <h4>${escapeHtml(cat.name)}</h4>
+                            <div class="gallery-meta">
+                                <span>${escapeHtml(cat.description || 'No description')}</span>
+                                <span class="product-count">${count} items</span>
+                            </div>
+                        </div>
+                        <button class="delete-btn" onclick="event.stopPropagation(); editCategory(${cat.id})" style="position: absolute; top: 0.5rem; right: 0.5rem; background: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);">
+                            <i class="fas fa-pencil-alt" style="color: var(--primary-color);"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render list view
+        function renderListView(container) {
+            container.className = 'list-view';
+            
+            container.innerHTML = categories.map(cat => {
+                const count = getProductCount(cat.name);
+                const imageHtml = cat.image 
+                    ? `<img src="${cat.image}" class="list-image" alt="${escapeHtml(cat.name)}" onerror="this.parentElement.querySelector('.list-image').outerHTML='<div class=\\'list-image-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'">`
+                    : `<div class="list-image-placeholder"><i class="fas fa-box"></i></div>`;
+                
+                return `
+                    <div class="list-card" onclick="viewCategory('${escapeHtml(cat.name)}')">
+                        ${imageHtml}
+                        <div class="list-info">
+                            <h4>${escapeHtml(cat.name)}</h4>
+                            <p>${escapeHtml(cat.description || 'No description')} • ${count} products</p>
+                        </div>
+                        <button class="icon-btn" onclick="event.stopPropagation(); editCategory(${cat.id})" style="background: none; color: var(--text-secondary);">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // CAMERA FUNCTIONS
+
+        // Open camera
+        function openCamera() {
+            document.getElementById('cameraInput').click();
+        }
+
+        // Handle image capture
+        function handleImageCapture(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show loading
+            const uploadDiv = document.querySelector('.camera-upload');
+            uploadDiv.classList.add('uploading');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                tempImageData = e.target.result;
+                
+                // Show preview
+                document.getElementById('categoryImagePreview').src = tempImageData;
+                document.getElementById('imagePreviewContainer').style.display = 'block';
+                document.querySelector('.camera-upload').style.display = 'none';
+                uploadDiv.classList.remove('uploading');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Clear image
+        function clearImage() {
+            tempImageData = null;
+            document.getElementById('categoryImage').value = '';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.querySelector('.camera-upload').style.display = 'block';
+            document.getElementById('cameraInput').value = '';
+        }
+
+        // MODAL FUNCTIONS
+
+        // Show add category modal
+        function showAddCategoryModal() {
+            document.getElementById('addCategoryModal').classList.add('active');
+            clearImage();
+        }
+
+        // Close add category modal
+        function closeAddCategoryModal() {
+            document.getElementById('addCategoryModal').classList.remove('active');
+            document.getElementById('addCategoryForm').reset();
+            clearImage();
+        }
+
+        // Save new category
+        function saveCategory(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('categoryName').value.trim();
+            const description = document.getElementById('categoryDescription').value.trim();
+            
+            if (!name) {
+                showNotification('Please enter category name', 'error');
+                return;
+            }
+
+            // Check for duplicate
+            if (categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('Category already exists', 'error');
+                return;
+            }
+
+            const category = {
+                id: Date.now(),
+                name: name,
+                description: description,
+                image: tempImageData,
+                createdAt: new Date().toISOString()
+            };
+
+            categories.push(category);
+            localStorage.setItem('categories', JSON.stringify(categories));
+            
+            closeAddCategoryModal();
+            renderCategories();
+            showNotification('Category added successfully!', 'success');
+        }
+
+        // Edit category
+        function editCategory(id) {
+            const category = categories.find(c => c.id === id);
+            if (!category) return;
+
+            currentEditingId = id;
+            
+            document.getElementById('editCategoryId').value = id;
+            document.getElementById('editCategoryName').value = category.name;
+            document.getElementById('editCategoryDescription').value = category.description || '';
+            document.getElementById('editCategoryImage').value = category.image || '';
+            
+            // Setup image container
+            const container = document.getElementById('editImageContainer');
+            if (category.image) {
+                container.innerHTML = `
+                    <img src="${category.image}" class="category-image-preview" id="editPreviewImg">
+                    <div class="image-actions">
+                        <button type="button" class="image-action-btn danger" onclick="clearEditImage()">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                        <button type="button" class="image-action-btn" onclick="document.getElementById('editCameraInput').click()">
+                            <i class="fas fa-camera"></i> Change
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="camera-upload" onclick="document.getElementById('editCameraInput').click()">
+                        <i class="fas fa-camera"></i>
+                        <p>Add category photo</p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('editCategoryModal').classList.add('active');
+        }
+
+        // Handle edit image capture
+        function handleEditImageCapture(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageData = e.target.result;
+                document.getElementById('editCategoryImage').value = imageData;
+                
+                // Update preview
+                const container = document.getElementById('editImageContainer');
+                container.innerHTML = `
+                    <img src="${imageData}" class="category-image-preview" id="editPreviewImg">
+                    <div class="image-actions">
+                        <button type="button" class="image-action-btn danger" onclick="clearEditImage()">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                        <button type="button" class="image-action-btn" onclick="document.getElementById('editCameraInput').click()">
+                            <i class="fas fa-camera"></i> Change
+                        </button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Clear edit image
+        function clearEditImage() {
+            document.getElementById('editCategoryImage').value = '';
+            const container = document.getElementById('editImageContainer');
+            container.innerHTML = `
+                <div class="camera-upload" onclick="document.getElementById('editCameraInput').click()">
+                    <i class="fas fa-camera"></i>
+                    <p>Add category photo</p>
+                </div>
+            `;
+        }
+
+        // Close edit modal
+        function closeEditCategoryModal() {
+            document.getElementById('editCategoryModal').classList.remove('active');
+            currentEditingId = null;
+        }
+
+        // Update category
+        function updateCategory(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('editCategoryId').value);
+            const name = document.getElementById('editCategoryName').value.trim();
+            const description = document.getElementById('editCategoryDescription').value.trim();
+            const image = document.getElementById('editCategoryImage').value;
+            
+            if (!name) {
+                showNotification('Please enter category name', 'error');
+                return;
+            }
+
+            // Check for duplicate (excluding current)
+            const duplicate = categories.find(c => 
+                c.id !== id && c.name.toLowerCase() === name.toLowerCase()
+            );
+            if (duplicate) {
+                showNotification('Category name already exists', 'error');
+                return;
+            }
+
+            const index = categories.findIndex(c => c.id === id);
+            if (index !== -1) {
+                // Update products if name changed
+                const oldName = categories[index].name;
+                if (oldName !== name) {
+                    products = products.map(p => {
+                        if (p.category === oldName) {
+                            p.category = name;
+                        }
+                        return p;
+                    });
+                    localStorage.setItem('products', JSON.stringify(products));
+                }
+
+                categories[index] = {
+                    ...categories[index],
+                    name: name,
+                    description: description,
+                    image: image || null,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem('categories', JSON.stringify(categories));
+                closeEditCategoryModal();
+                renderCategories();
+                showNotification('Category updated!', 'success');
+            }
+        }
+
+        // Delete current category
+        function deleteCurrentCategory() {
+            if (!currentEditingId) return;
+            deleteCategory(currentEditingId);
+        }
+
+        // Delete category
+        function deleteCategory(id) {
+            if (!confirm('Delete this category? Products will NOT be deleted.')) return;
+
+            categories = categories.filter(c => c.id !== id);
+            localStorage.setItem('categories', JSON.stringify(categories));
+            
+            closeEditCategoryModal();
+            renderCategories();
+            showNotification('Category deleted', 'info');
+        }
+
+        // View category (go to stock with filter)
+        function viewCategory(name) {
+            localStorage.setItem('selectedCategory', name);
+            window.location.href = 'stock.html';
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Go back
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

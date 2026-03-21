@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>Register - Kasuwa Dan Goronyo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+
+        .auth-header {
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+        }
+
+        .auth-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .auth-form-container {
+            flex: 1;
+            background: var(--bg-color);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: 2rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 1rem 1rem 1rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            background: var(--card-bg);
+            transition: var(--transition);
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0;
+            transition: var(--transition);
+        }
+
+        .strength-text {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            color: var(--text-secondary);
+        }
+
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .terms-check input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-color);
+            margin-top: 2px;
+        }
+
+        .terms-check label {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .terms-check a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .auth-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn {
+            padding: 0.875rem;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .social-btn:hover {
+            background: var(--bg-color);
+        }
+
+        .social-btn i {
+            font-size: 1.25rem;
+        }
+
+        .social-btn.google i { color: #db4437; }
+        .social-btn.phone i { color: var(--success-color); }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .auth-btn.loading .btn-text {
+            display: none;
+        }
+
+        .auth-btn.loading .loading-spinner {
+            display: block;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .step-dot.active {
+            background: var(--primary-color);
+            width: 30px;
+            border-radius: 5px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .step-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .step-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .step-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .store-preview {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+        }
+
+        .store-preview-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+        }
+
+        .store-preview h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .store-preview p {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="auth-page">
+        <!-- Auth Header -->
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1>Create Account</h1>
+            <p>Start managing your store today</p>
+        </div>
+
+        <!-- Auth Form -->
+        <div class="auth-form-container">
+            <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                
+                <!-- Step 1: Personal Info -->
+                <div class="form-step active" id="step1">
+                    <div class="step-indicator">
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="firstName" placeholder="First name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="lastName" placeholder="Last name" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <div class="input-group">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="phone" placeholder="08012345678" required>
+                        </div>
+                    </div>
+
+                    <div class="step-buttons">
+                        <button type="button" class="step-btn primary" onclick="nextStep(2)">
+                            Continue <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Store Info -->
+                <div class="form-step" id="step2">
+                    <div class="step-indicator">
+                        <div class="step-dot"></div>
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Store Name *</label>
+                        <div class="input-group">
+                            <i class="fas fa-store"></i>
+                            <input type="text" id="storeName" placeholder="Your store name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Store Type</label>
+                        <div class="input-group">
+                            <i class="fas fa-building"></i>
+                            <select id="storeType">
+                                <option value="retail">Retail Store</option>
+                                <option value="wholesale">Wholesale</option>
+                                <option value="supermarket">Supermarket</option>
+                                <option value="boutique">Boutique</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <div class="input-group">
+                            <i class="fas fa-money-bill"></i>
+                            <select id="currency">
+                                <option value="₦">Naira (₦)</option>
+                                <option value="$">Dollar ($)</option>
+                                <option value="€">Euro (€)</option>
+                                <option value="£">Pound (£)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="step-buttons">
+                        <button type="button" class="step-btn" onclick="prevStep(1)">Back</button>
+                        <button type="button" class="step-btn primary" onclick="nextStep(3)">
+                            Continue <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Security -->
+                <div class="form-step" id="step3">
+                    <div class="step-indicator">
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot active"></div>
+                    </div>
+
+                    <div class="store-preview">
+                        <div class="store-preview-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h3 id="previewStoreName">Your Store</h3>
+                        <p>Complete your registration</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Create Password *</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="Min 8 characters" required minlength="8" onkeyup="checkPasswordStrength()">
+                            <button type="button" class="password-toggle" onclick="togglePassword('password', 'toggleIcon1')">
+                                <i class="fas fa-eye" id="toggleIcon1"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <div class="strength-text" id="strengthText">Enter password</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password *</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirmPassword" placeholder="Repeat password" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', 'toggleIcon2')">
+                                <i class="fas fa-eye" id="toggleIcon2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="terms-check">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label>
+                            I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and 
+                            <a href="#" onclick="showPrivacy()">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <div class="step-buttons">
+                        <button type="button" class="step-btn" onclick="prevStep(2)">Back</button>
+                        <button type="submit" class="step-btn primary" id="registerBtn">
+                            <span class="btn-text">Create Account</span>
+                            <div class="loading-spinner"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-divider">or register with</div>
+
+                <div class="social-login">
+                    <button type="button" class="social-btn google" onclick="socialRegister('google')">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="social-btn phone" onclick="socialRegister('phone')">
+                        <i class="fas fa-phone"></i>
+                        <span>Phone</span>
+                    </button>
+                </div>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="login.html">Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentStep = 1;
+
+        function nextStep(step) {
+            // Validate current step
+            if (step === 2) {
+                if (!document.getElementById('firstName').value || 
+                    !document.getElementById('lastName').value ||
+                    !document.getElementById('email').value ||
+                    !document.getElementById('phone').value) {
+                    showNotification('Please fill in all fields', 'error');
+                    return;
+                }
+            }
+
+            if (step === 3) {
+                if (!document.getElementById('storeName').value) {
+                    showNotification('Please enter store name', 'error');
+                    return;
+                }
+                
+                // Update preview
+                document.getElementById('previewStoreName').textContent = document.getElementById('storeName').value;
+            }
+
+            // Hide all steps
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            
+            // Show target step
+            document.getElementById('step' + step).classList.add('active');
+            currentStep = step;
+        }
+
+        function prevStep(step) {
+            document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            currentStep = step;
+        }
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            const colors = ['#e74c3c', '#e67e22', '#f1c40f', '#27ae60'];
+            const texts = ['Weak', 'Fair', 'Good', 'Strong'];
+            
+            fill.style.width = (strength * 25) + '%';
+            fill.style.backgroundColor = colors[strength - 1] || '#e74c3c';
+            text.textContent = texts[strength - 1] || 'Too short';
+            text.style.color = colors[strength - 1] || '#e74c3c';
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+
+            if (!document.getElementById('agreeTerms').checked) {
+                showNotification('Please agree to terms', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('registerBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                const user = {
+                    id: Date.now(),
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    storeName: document.getElementById('storeName').value,
+                    storeType: document.getElementById('storeType').value,
+                    currency: document.getElementById('currency').value,
+                    password: password,
+                    createdAt: new Date().toISOString()
+                };
+
+                // Save user
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                
+                // Check if email exists
+                if (users.some(u => u.email === user.email)) {
+                    showNotification('Email already registered', 'error');
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    return;
+                }
+
+                users.push(user);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // Set as current user
+                localStorage.setItem('user', JSON.stringify(user));
+                
+                // Create session
+                const session = {
+                    user: user,
+                    loginTime: new Date().toISOString(),
+                    token: Date.now().toString(36)
+                };
+                localStorage.setItem('currentSession', JSON.stringify(session));
+
+                showNotification('Account created successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }, 2000);
+        }
+
+        function socialRegister(provider) {
+            showNotification(`${provider} registration coming soon!`, 'info');
+        }
+
+        function showTerms() {
+            showNotification('Terms of Service coming soon!', 'info');
+        }
+
+        function showPrivacy() {
+            showNotification('Privacy Policy coming soon!', 'info');
+        }
+    </script>
+</body>
+</html>

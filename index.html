@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f2a">
+    <title>Login - Kasuwa Dan Goronyo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+
+        .auth-header {
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+        }
+
+        .auth-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .auth-form-container {
+            flex: 1;
+            background: var(--bg-color);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: 2rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            background: var(--card-bg);
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        .forgot-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .auth-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn {
+            padding: 0.875rem;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .social-btn:hover {
+            background: var(--bg-color);
+        }
+
+        .social-btn i {
+            font-size: 1.25rem;
+        }
+
+        .social-btn.google i { color: #db4437; }
+        .social-btn.phone i { color: var(--success-color); }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .biometric-login {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .biometric-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            background: none;
+            color: var(--primary-color);
+            font-size: 1.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .biometric-btn:hover {
+            background: rgba(26, 95, 42, 0.1);
+        }
+
+        .biometric-text {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .auth-btn.loading .btn-text {
+            display: none;
+        }
+
+        .auth-btn.loading .loading-spinner {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="auth-page">
+        <!-- Auth Header -->
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-store"></i>
+            </div>
+            <h1>Kasuwa Dan Goronyo</h1>
+            <p>Welcome back! Please sign in to continue.</p>
+        </div>
+
+        <!-- Auth Form -->
+        <div class="auth-form-container">
+            <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email or Phone</label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginEmail" placeholder="Enter email or phone number" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="auth-btn" id="loginBtn">
+                    <span class="btn-text">Sign In</span>
+                    <div class="loading-spinner"></div>
+                </button>
+
+                <div class="auth-divider">or continue with</div>
+
+                <div class="social-login">
+                    <button type="button" class="social-btn google" onclick="socialLogin('google')">
+                        <i class="fab fa-google"></i>
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="social-btn phone" onclick="socialLogin('phone')">
+                        <i class="fas fa-phone"></i>
+                        <span>Phone</span>
+                    </button>
+                </div>
+
+                <div class="biometric-login">
+                    <button type="button" class="biometric-btn" onclick="biometricLogin()">
+                        <i class="fas fa-fingerprint"></i>
+                    </button>
+                    <p class="biometric-text">Use biometric login</p>
+                </div>
+
+                <div class="auth-footer">
+                    Don't have an account? <a href="register.html">Sign Up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const session = localStorage.getItem('currentSession');
+            if (session) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('loginPassword');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const btn = document.getElementById('loginBtn');
+            
+            if (!email || !password) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+
+            // Show loading
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                // Check credentials
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const user = users.find(u => 
+                    (u.email === email || u.phone === email) && u.password === password
+                );
+
+                if (user) {
+                    // Create session
+                    const session = {
+                        user: user,
+                        loginTime: new Date().toISOString(),
+                        token: Date.now().toString(36)
+                    };
+                    
+                    localStorage.setItem('currentSession', JSON.stringify(session));
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+
+                    showNotification('Login successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    // Check for default user
+                    const defaultUser = JSON.parse(localStorage.getItem('user'));
+                    if (defaultUser && (defaultUser.email === email || defaultUser.phone === email)) {
+                        // Create session for default user
+                        const session = {
+                            user: defaultUser,
+                            loginTime: new Date().toISOString(),
+                            token: Date.now().toString(36)
+                        };
+                        localStorage.setItem('currentSession', JSON.stringify(session));
+                        showNotification('Login successful!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1000);
+                    } else {
+                        showNotification('Invalid email or password', 'error');
+                        btn.classList.remove('loading');
+                        btn.disabled = false;
+                    }
+                }
+            }, 1500);
+        }
+
+        function socialLogin(provider) {
+            showNotification(`${provider} login coming soon!`, 'info');
+        }
+
+        function biometricLogin() {
+            if ('credentials' in navigator) {
+                navigator.credentials.get({ publicKey: {} })
+                    .then(() => {
+                        showNotification('Biometric authentication successful!', 'success');
+                    })
+                    .catch(() => {
+                        showNotification('Biometric authentication failed', 'error');
+                    });
+            } else {
+                showNotification('Biometric login not supported on this device', 'error');
+            }
+        }
+
+        // Load remembered email
+        document.addEventListener('DOMContentLoaded', function() {
+            const remembered = localStorage.getItem('rememberedEmail');
+            if (remembered) {
+                document.getElementById('loginEmail').value = remembered;
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                showNotification('👋 Logged out successfully!', 'success');
+                setTimeout(() => {
+                    localStorage.removeItem('currentSession');
+                    window.location.reload();
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>

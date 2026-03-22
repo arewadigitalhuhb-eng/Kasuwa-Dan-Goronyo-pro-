@@ -503,7 +503,7 @@
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <a href="index.html" class="nav-link">
+            <a href="dashboard.html" class="nav-link">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
@@ -853,9 +853,9 @@
             }
 
             const index = categories.findIndex(c => c.id === id);
-            if (index !== -1) {
+            if (dashboard !== -1) {
                 // Update products if name changed
-                const oldName = categories[index].name;
+                const oldName = categories[dashboard].name;
                 if (oldName !== name) {
                     products = products.map(p => {
                         if (p.category === oldName) {
@@ -867,7 +867,7 @@
                 }
 
                 categories[index] = {
-                    ...categories[index],
+                    ...categories[dashboard],
                     name: name,
                     description: description,
                     image: image || null,
